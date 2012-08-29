@@ -1,0 +1,10 @@
+<h1>Available Regions</h1>
+<h3><%= @regions.length %> regions available:</h3>
+<ol>
+<% @regions.each do |region| %>
+  <li><%= link_to region, "/aws/region/#{region}" %></li>
+<% end %>
+</ol>
+
+
+
