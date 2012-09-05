@@ -39,3 +39,7 @@ gem 'jquery-rails'
 # gem 'ruby-debug'
 gem 'aws-sdk'
 gem 'net-ssh', '~> 2.1.4'
+
+gem 'activeadmin'
+#gem 'sass-rails'
+gem "meta_search",    '>= 1.1.0.pre'

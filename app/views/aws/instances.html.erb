@@ -1,8 +1,11 @@
-<h1><%= @region %> region</h1>
+<h1>All regions</h1>
 <table border="1" cellpadding="2">
   <tr>
     <th>
       Name
+    </th>
+    <th>
+      Region
     </th>
     <% Account::INSTANCE_PARAMETERS.each do |p| %>
     <th>
@@ -13,12 +16,10 @@
 <% @instances.each do |instance| %>
   <tr>
     <td><%= instance[:name] %></td>
+    <td><%= instance[:region] %></td>
     <% Account::INSTANCE_PARAMETERS.each do |p| %>
       <td><%= instance[p] %></td>
     <% end %>
   </tr>
 <% end %>
 </table>
-<div>
-<%= link_to "Regions", "/aws/regions" %>
-</div>

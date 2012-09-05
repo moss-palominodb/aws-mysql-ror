@@ -1,5 +1,10 @@
 AwsConsole::Application.routes.draw do
-  get "aws/regions"
+  ActiveAdmin.routes(self)
+
+  devise_for :admin_users, ActiveAdmin::Devise.config
+
+#  get "aws/regions"
+  get "aws/instances"
 
 #  get "aws/region"
   match 'aws/region/:id' => 'aws#region'
