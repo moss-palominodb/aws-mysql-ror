@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  aws_id: MyString
+  status: MyString
+  instance_type: MyString
+  image_id: MyString
+  launch_time: 2012-09-05 18:27:28
+  availability_zone: MyString
+  platform: MyString
+  private_ip_address: MyString
+  ip_address: MyString
+  architecture: MyString
+  root_device_type: MyString
+
+two:
+  aws_id: MyString
+  status: MyString
+  instance_type: MyString
+  image_id: MyString
+  launch_time: 2012-09-05 18:27:28
+  availability_zone: MyString
+  platform: MyString
+  private_ip_address: MyString
+  ip_address: MyString
+  architecture: MyString
+  root_device_type: MyString
