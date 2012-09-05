@@ -38,4 +38,5 @@ AwsConsole::Application.configure do
   # directed from installation of active_admin:
   #config.action_mailer.default_url_options = { :host => 'localhost:3000' }
   config.action_mailer.default_url_options = { :host => 'localhost' }
+  config.log_level = :debug
 end
