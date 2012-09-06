@@ -12,4 +12,12 @@ ActiveAdmin.register Instance do
     f.buttons
   end
 
+  action_item do 
+    link_to('Refresh', refresh_admin_instances_path) 
+  end 
+
+  collection_action :refresh, :method => :get do 
+    Instance.refresh_instances_from_aws
+    redirect_to '/admin/instances'
+  end 
 end

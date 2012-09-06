@@ -10,13 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120905225841) do
-
-  create_table "accounts", :force => true do |t|
-    t.string   "name"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
+ActiveRecord::Schema.define(:version => 20120906193524) do
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -83,6 +77,9 @@ ActiveRecord::Schema.define(:version => 20120905225841) do
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
     t.boolean  "valid"
+    t.boolean  "display"
   end
+
+  add_index "regions", ["name"], :name => "index_regions_on_name", :unique => true
 
 end

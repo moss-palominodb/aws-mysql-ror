@@ -4,23 +4,28 @@ ActiveAdmin::Dashboards.build do
   # rendered on the dashboard in the context of the view. So just
   # return the content which you would like to display.
   
-  section "Instances" do
-    instances = Account::instances
-    table do
-      tr do
-        instances.first.keys.each do |key|
-          th wordize key.to_s
-        end
-      end
-      instances.each do |instance|
-        tr do
-          instance.keys.each do |parameter|
-            td instance[parameter]
-          end
-        end
-      end
+  section "Refresh" do
+    div do
+      link_to "Refresh", 'admin/instances/refresh_instances'
     end
   end
+#  section "Instances" do
+#    instances = Account::instances
+#    table do
+#      tr do
+#        instances.first.keys.each do |key|
+#          th wordize key.to_s
+#        end
+#      end
+#      instances.each do |instance|
+#        tr do
+#          instance.keys.each do |parameter|
+#            td instance[parameter]
+#          end
+#        end
+#      end
+#    end
+#  end
   # == Simple Dashboard Section
   # Here is an example of a simple dashboard section
   #
