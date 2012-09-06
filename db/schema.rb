@@ -76,7 +76,6 @@ ActiveRecord::Schema.define(:version => 20120906193524) do
     t.string   "name"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
-    t.boolean  "valid"
     t.boolean  "display"
   end
 
