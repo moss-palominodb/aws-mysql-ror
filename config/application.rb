@@ -58,5 +58,7 @@ module AwsConsole
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
+
+    DEFAULT_REGION = 'us-west-1'
   end
 end

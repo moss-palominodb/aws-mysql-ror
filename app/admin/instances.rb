@@ -2,6 +2,9 @@ ActiveAdmin.register Instance do
 
   form do |f|
     f.inputs "Parameters" do
+      f.input :region_name, :as => :select,
+                         :collection => Region.where(:display => true).map(&:name),
+                         :selected => AwsConsole::Application::DEFAULT_REGION
       f.input :image_id, :as => :select,
                          :collection => Instance.available_image_ids
       f.input :security_group, :as => :select,

@@ -1,5 +1,5 @@
 class Instance < ActiveRecord::Base
-  attr_accessible :architecture, :availability_zone, :aws_id, :image_id, :instance_type, :ip_address, :launch_time, :platform, :private_ip_address, :root_device_type, :status, :key_pair, :security_group, :name, :existing, :region
+  attr_accessible :architecture, :availability_zone, :aws_id, :image_id, :instance_type, :ip_address, :launch_time, :platform, :private_ip_address, :root_device_type, :status, :key_pair, :security_group, :name, :existing, :region, :region_name
 
   attr_accessor :existing, :region_name
 
@@ -12,19 +12,19 @@ class Instance < ActiveRecord::Base
 
   def self.available_image_ids
     ec2 = AWS::EC2.new
-    ec2 = ec2.regions['us-west-1']
-    ec2.images.with_owner('self').map(&:id)
+    ec2 = ec2.regions[AwsConsole::Application::DEFAULT_REGION]
+    ec2.images.with_owner('self').collect{ |i| ["#{i.name} (#{i.id})", i.id]}
   end
 
   def self.available_security_groups
     ec2 = AWS::EC2.new
-    ec2 = ec2.regions['us-west-1']
-    ec2.security_groups.map(&:name)
+    ec2 = ec2.regions[AwsConsole::Application::DEFAULT_REGION]
+    ec2.security_groups.collect{ |g| [g.name, g.id] }
   end
 
   def self.available_key_pairs
     ec2 = AWS::EC2.new
-    ec2 = ec2.regions['us-west-1']
+    ec2 = ec2.regions[AwsConsole::Application::DEFAULT_REGION]
     ec2.key_pairs.map(&:name)
   end
 
@@ -45,6 +45,8 @@ class Instance < ActiveRecord::Base
       return false
     end
     self.status = i.status.to_s
+    self.key_pair = i.key_pair.name
+    self.security_group = group.name
     self.launch_time = i.launch_time
     self.architecture = i.architecture
     self.availability_zone = i.availability_zone
@@ -59,9 +61,10 @@ class Instance < ActiveRecord::Base
       unless local_region = Region.where(['name = ?', region_name]).first
         local_region = Region.create!({:name => region_name}) 
       end
-      local_region.update_attribute(:display, ec2_region.instances.length > 0)
+      local_region.update_attribute(:display, ec2_region.instances.count > 0)
     end
     region_names.each do |region_name|
+      ec2_region = ec2.regions[region_name]
       ec2_region.instances.each do |instance|
         name = "BLANK"
         instance.tags.each do |tag|
