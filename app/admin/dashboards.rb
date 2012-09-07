@@ -4,28 +4,14 @@ ActiveAdmin::Dashboards.build do
   # rendered on the dashboard in the context of the view. So just
   # return the content which you would like to display.
   
-  section "Refresh" do
-    div do
-      link_to "Refresh", 'admin/instances/refresh_instances'
+  section "New Cluster" do
+    form :action => create_cluster_admin_instances_path, :method => :post do |f|
+      div f.input :name => :slave_count      
+      div f.input :name => :cluster_name      
+      div f.input :type => :submit
     end
   end
-#  section "Instances" do
-#    instances = Account::instances
-#    table do
-#      tr do
-#        instances.first.keys.each do |key|
-#          th wordize key.to_s
-#        end
-#      end
-#      instances.each do |instance|
-#        tr do
-#          instance.keys.each do |parameter|
-#            td instance[parameter]
-#          end
-#        end
-#      end
-#    end
-#  end
+
   # == Simple Dashboard Section
   # Here is an example of a simple dashboard section
   #

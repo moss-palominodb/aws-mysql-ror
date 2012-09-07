@@ -15,6 +15,18 @@ ActiveAdmin.register Instance do
     f.buttons
   end
 
+  index do
+    column :name
+    column "AWS ID", :aws_id
+    column :availability_zone
+    column "Region" do |i|
+      i.region.name if i.region
+    end
+    column :architecture
+    column "Image ID", :image_id
+    column :status
+  end
+
   action_item do 
     link_to('Refresh', refresh_admin_instances_path) 
   end 
@@ -22,5 +34,11 @@ ActiveAdmin.register Instance do
   collection_action :refresh, :method => :get do 
     Instance.refresh_instances_from_aws
     redirect_to '/admin/instances'
+  end 
+
+  collection_action :create_cluster, :method => :post do 
+    logger.debug "Create Cluster"
+    logger.debug params.inspect
+    @cluster_tag = params[:cluster_name]
   end 
 end

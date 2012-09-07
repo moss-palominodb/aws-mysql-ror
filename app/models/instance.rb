@@ -1,5 +1,5 @@
 class Instance < ActiveRecord::Base
-  attr_accessible :architecture, :availability_zone, :aws_id, :image_id, :instance_type, :ip_address, :launch_time, :platform, :private_ip_address, :root_device_type, :status, :key_pair, :security_group, :name, :existing, :region, :region_name
+  attr_accessible :architecture, :availability_zone, :aws_id, :image_id, :instance_type, :ip_address, :launch_time, :platform, :private_ip_address, :root_device_type, :status, :key_pair, :security_group, :name, :existing, :region, :region_id
 
   attr_accessor :existing, :region_name
 
@@ -55,6 +55,7 @@ class Instance < ActiveRecord::Base
 
   def self.refresh_instances_from_aws
     ec2 = AWS::EC2.new
+    AWS::start_memoizing
     region_names = ec2.regions.map(&:name)
     region_names.each do |region_name|
       ec2_region = ec2.regions[region_name]
@@ -64,6 +65,8 @@ class Instance < ActiveRecord::Base
       local_region.update_attribute(:display, ec2_region.instances.count > 0)
     end
     region_names.each do |region_name|
+      local_region = Region.where(['name = ?', region_name]).first
+      logger.debug "local region name = #{local_region.name}"
       ec2_region = ec2.regions[region_name]
       ec2_region.instances.each do |instance|
         name = "BLANK"
@@ -81,8 +84,8 @@ class Instance < ActiveRecord::Base
               instance_data[c.name] = instance.id
             when 'key_pair'
               instance_data[c.name] = instance.key_pair.name
-            when 'region'
-              instance_data[c.name] = local_region
+            when 'region_id'
+              instance_data['region_id'] = local_region.id
             when 'security_group'
               #TODO allow multiple
               instance_data[c.name] = instance.security_groups.first.name
@@ -90,7 +93,6 @@ class Instance < ActiveRecord::Base
               instance_data[c.name] = instance.send(c.name).to_s if instance.respond_to? c.name
           end
         end
-        logger.debug "Instance Data:"
         logger.debug instance_data.inspect
         if i = Instance.where(['aws_id = ?', instance_data['aws_id']]).first
           i.update_attributes!(instance_data)
@@ -99,5 +101,6 @@ class Instance < ActiveRecord::Base
         end
       end
     end
+    AWS::stop_memoizing
   end
 end
