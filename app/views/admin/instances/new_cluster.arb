@@ -1,0 +1,36 @@
+    form :action => "/admin/instances/create_cluster",
+         :method => :post do |f|
+      table do
+        tr do
+          th "Cluster Tag"
+          th "Role Tag"
+          th "Security Group"
+          th "Image ID"
+          th "Key Pair"
+          th "Instance Type"
+        end
+        tr do
+          f.input :type => :hidden, :name => 'instance_indexes[]', :value => 0
+          f.input :type => :hidden, :name => 'cluster_name', :value => params[:cluster_name]
+          td params[:cluster_name]
+          td "Master"
+          td f.select options_for_select(Instance.available_security_groups), {:name => "instance_0[security_group]"}
+          td f.select options_for_select(Instance.available_image_ids), {:name => "instance_0[image_id]"}
+          td f.select options_for_select(Instance.available_key_pairs), {:name => "instance_0[key_pair]"}
+          td f.select  options_for_select(InstanceType.all.map(&:name).sort.reverse), {:name => "instance_0[instance_type]"}
+        end
+        for i in 1..params[:slave_count].to_i do
+          tr do
+            f.input :type => :hidden, :name => 'instance_indexes[]', :value => i
+            td params[:cluster_name]
+            td "Slave"
+            td f.select options_for_select(Instance.available_security_groups), {:name => "instance_#{i}[security_group]"}
+            td f.select options_for_select(Instance.available_image_ids), {:name => "instance_#{i}[image_id]"}
+            td f.select options_for_select(Instance.available_key_pairs), {:name => "instance_#{i}[key_pair]"}
+            td f.select  options_for_select(InstanceType.all.map(&:name).sort.reverse), {:name => "instance_#{i}[instance_type]"}
+          end
+        end
+      end
+      f.input :type => :submit
+    end
+
