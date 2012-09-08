@@ -36,9 +36,15 @@ ActiveAdmin.register Instance do
     redirect_to '/admin/instances'
   end 
 
+  collection_action :new_cluster, :method => :post do 
+  end 
+
   collection_action :create_cluster, :method => :post do 
-    logger.debug "Create Cluster"
-    logger.debug params.inspect
-    @cluster_tag = params[:cluster_name]
+    instance_indexes = params['instance_indexes']
+    instance_indexes.each do |i|
+      instance = Instance.create!(params["instance_#{i}"])
+      logger.debug("##{i} is #{instance.valid? ? 'Valid' : 'Invalid'}")
+    end
+    redirect_to '/admin/instances'
   end 
 end
