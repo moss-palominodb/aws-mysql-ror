@@ -41,10 +41,12 @@ ActiveAdmin.register Instance do
 
   collection_action :create_cluster, :method => :post do 
     instance_indexes = params['instance_indexes']
+    ids = []
     instance_indexes.each do |i|
       instance = Instance.create!(params["instance_#{i}"])
+      ids << instance.aws_id
       logger.debug("##{i} is #{instance.valid? ? 'Valid' : 'Invalid'}")
     end
-    redirect_to '/admin/instances'
+    redirect_to '/admin/instances', :notice => "Created #{instance_indexes.length} new instances: #{ids.join(', ')}"
   end 
 end

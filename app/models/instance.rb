@@ -1,7 +1,7 @@
 class Instance < ActiveRecord::Base
-  attr_accessible :architecture, :availability_zone, :aws_id, :image_id, :instance_type, :ip_address, :launch_time, :platform, :private_ip_address, :root_device_type, :status, :key_pair, :security_group, :name, :existing, :region, :region_id
+  attr_accessible :architecture, :availability_zone, :aws_id, :image_id, :instance_type, :ip_address, :launch_time, :platform, :private_ip_address, :root_device_type, :status, :key_pair, :security_group, :name, :existing, :region, :region_id, :cluster_name, :role
 
-  attr_accessor :existing, :region_name
+  attr_accessor :existing, :region_name, :cluster_name, :role
 
   validates :key_pair, :presence => true
   validates :image_id, :presence => true
@@ -32,14 +32,17 @@ class Instance < ActiveRecord::Base
   def create_instance_in_ec2
     return if existing
     ec2 = AWS::EC2.new
-    # change region ec2 = ec2.regions['region-name']
-    ec2 = ec2.regions[region_name]
+    #ec2 = ec2.regions[region_name]
+    ec2 = ec2.regions[AwsConsole::Application::DEFAULT_REGION]
     begin
       image = ec2.images[image_id]
       group = ec2.security_groups[security_group]
       pair = ec2.key_pairs[key_pair]
       i = image.run_instance(:key_pair => pair,
                                     :security_groups => group)
+      i.tag('cluster', :value => cluster_name)
+      i.tag('role', :value => role)
+      i.tag('Name', :value => "#{cluster_name}-#{role}")
     rescue
       logger.debug "Error"
       return false
