@@ -25,6 +25,7 @@ ActiveAdmin.register Instance do
     column :architecture
     column "Image ID", :image_id
     column :status
+    column :instance_type
   end
 
   action_item do 
