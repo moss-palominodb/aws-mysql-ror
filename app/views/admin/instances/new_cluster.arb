@@ -25,7 +25,7 @@
           tr do
             f.input :type => :hidden, :name => 'instance_indexes[]', :value => i
             f.input :type => :hidden, :name => "instance_#{i}[cluster_name]", :value => params[:cluster_name]
-            f.input :type => :hidden, :name => 'instance_#{i}[role]', :value => "Slave"
+            f.input :type => :hidden, :name => "instance_#{i}[role]", :value => "Slave"
             td params[:cluster_name]
             td "Slave"
             td f.select options_for_select(Instance.available_security_groups), {:name => "instance_#{i}[security_group]"}

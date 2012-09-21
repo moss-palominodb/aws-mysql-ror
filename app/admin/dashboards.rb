@@ -4,13 +4,6 @@ ActiveAdmin::Dashboards.build do
   # rendered on the dashboard in the context of the view. So just
   # return the content which you would like to display.
   
-  section "New Cluster" do
-    form :action => create_cluster_admin_instances_path, :method => :post do |f|
-      div f.input :name => :slave_count      
-      div f.input :name => :cluster_name      
-      div f.input :type => :submit
-    end
-  end
 
   # == Simple Dashboard Section
   # Here is an example of a simple dashboard section

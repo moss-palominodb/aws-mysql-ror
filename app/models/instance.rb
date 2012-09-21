@@ -39,7 +39,8 @@ class Instance < ActiveRecord::Base
       group = ec2.security_groups[security_group]
       pair = ec2.key_pairs[key_pair]
       i = image.run_instance(:key_pair => pair,
-                                    :security_groups => group)
+                            :security_groups => group,
+                            :instance_type => instance_type)
       i.tag('cluster', :value => cluster_name)
       i.tag('role', :value => role)
       i.tag('Name', :value => "#{cluster_name}-#{role}")
@@ -54,6 +55,8 @@ class Instance < ActiveRecord::Base
     self.architecture = i.architecture
     self.availability_zone = i.availability_zone
     self.aws_id = i.id
+    self.name = "#{cluster_name}-#{role}"
+    self.region = Region.where(['name = ?', ec2.name]).first
   end
 
   def self.refresh_instances_from_aws
