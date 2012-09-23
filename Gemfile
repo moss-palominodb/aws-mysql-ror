@@ -40,6 +40,7 @@ gem 'jquery-rails'
 gem 'aws-sdk'
 gem 'net-ssh', '~> 2.1.4'
 
-gem 'activeadmin'
+gem 'activeadmin', :git => 'git://github.com/gregbell/active_admin.git'
+# added the above so that batch_action would work, still seems buggy though
 #gem 'sass-rails'
 gem "meta_search",    '>= 1.1.0.pre'

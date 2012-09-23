@@ -43,6 +43,11 @@ ActiveAdmin.register Instance do
     redirect_to '/admin/instances', :notice => "Terminated instance #{i.name} (#{i.aws_id})"
   end
 
+  batch_action :destroy, :confirm => "Are you sure you want to terminate all of these instances?" do |selection|
+    Instance.find(selection).each { |i| i.destroy }
+    redirect_to collection_path, :notice => "Instances terminated"
+  end
+
   collection_action :refresh, :method => :get do 
     Instance.refresh_instances_from_aws
     redirect_to '/admin/instances'
