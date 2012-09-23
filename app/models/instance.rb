@@ -8,6 +8,7 @@ class Instance < ActiveRecord::Base
   validates :security_group, :presence => true
 
   before_save :create_instance_in_ec2
+  before_destroy :destroy_instance_in_ec2
   belongs_to :region
 
   def self.available_image_ids
@@ -59,7 +60,20 @@ class Instance < ActiveRecord::Base
     self.region = Region.where(['name = ?', ec2.name]).first
   end
 
+  def destroy_instance_in_ec2
+    ec2 = AWS::EC2.new
+    ec2 = ec2.regions[region.name]
+    begin
+      i = ec2.instances[aws_id]
+      i.terminate
+    rescue Exception => e
+      logger.debug "Error: #{e.message}"
+      return false
+    end
+  end
+
   def self.refresh_instances_from_aws
+    updated_aws_ids = []
     ec2 = AWS::EC2.new
     AWS::start_memoizing
     region_names = ec2.regions.map(&:name)
@@ -105,8 +119,12 @@ class Instance < ActiveRecord::Base
         else
           Instance.create!(instance_data)
         end
+        updated_aws_ids << instance_data['aws_id']
       end
     end
     AWS::stop_memoizing
+    Instance.where(["aws_id NOT IN (?)", updated_aws_ids]).each do |i|
+      i.delete
+    end
   end
 end

@@ -24,13 +24,24 @@ ActiveAdmin.register Instance do
     end
     column :architecture
     column "Image ID", :image_id
-    column :status
+    column "Status" do |i|
+      i.status
+    end
     column :instance_type
+    column "" do |i|
+      link_to "Terminate", terminate_admin_instance_path(i), {:confirm => "Are you sure you want to terminate #{i.name} (#{i.aws_id})?", :method => :post}
+    end
   end
 
   action_item do 
     link_to('Refresh', refresh_admin_instances_path) 
   end 
+
+  member_action :terminate, :method => :post do
+    i = Instance.find(params[:id])
+    i.destroy
+    redirect_to '/admin/instances', :notice => "Terminated instance #{i.name} (#{i.aws_id})"
+  end
 
   collection_action :refresh, :method => :get do 
     Instance.refresh_instances_from_aws
