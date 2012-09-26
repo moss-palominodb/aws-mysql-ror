@@ -6,6 +6,8 @@ ActiveAdmin.register_page "Create Cluster" do
         div f.input :name => :slave_count, :type => :select      
         div "Cluster Name:"
         div f.input :name => :cluster_name      
+        div "Region:"
+        div f.select options_for_select(Region.where(:display => true).map(&:name)), { :name => "region_name" }
         div f.input :type => :submit
       end
     end

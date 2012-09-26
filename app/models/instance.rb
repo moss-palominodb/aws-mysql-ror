@@ -1,5 +1,5 @@
 class Instance < ActiveRecord::Base
-  attr_accessible :architecture, :availability_zone, :aws_id, :image_id, :instance_type, :ip_address, :launch_time, :platform, :private_ip_address, :root_device_type, :status, :key_pair, :security_group, :name, :existing, :region, :region_id, :cluster_name, :role
+  attr_accessible :architecture, :availability_zone, :aws_id, :image_id, :instance_type, :ip_address, :launch_time, :platform, :private_ip_address, :root_device_type, :status, :key_pair, :security_group, :name, :existing, :region, :region_id, :cluster_name, :role, :region_name
 
   attr_accessor :existing, :region_name, :cluster_name, :role
 
@@ -11,37 +11,43 @@ class Instance < ActiveRecord::Base
   before_destroy :destroy_instance_in_ec2
   belongs_to :region
 
-  def self.available_image_ids
+  def self.available_image_ids(region_name)
     ec2 = AWS::EC2.new
-    ec2 = ec2.regions[AwsConsole::Application::DEFAULT_REGION]
+    ec2 = ec2.regions[region_name]
     ec2.images.with_owner('self').collect{ |i| ["#{i.name} (#{i.id})", i.id]}
   end
 
-  def self.available_security_groups
+  def self.available_security_groups(region_name)
     ec2 = AWS::EC2.new
-    ec2 = ec2.regions[AwsConsole::Application::DEFAULT_REGION]
+    ec2 = ec2.regions[region_name]
     ec2.security_groups.collect{ |g| [g.name, g.id] }
   end
 
-  def self.available_key_pairs
+  def self.available_key_pairs(region_name)
     ec2 = AWS::EC2.new
-    ec2 = ec2.regions[AwsConsole::Application::DEFAULT_REGION]
+    ec2 = ec2.regions[region_name]
     ec2.key_pairs.map(&:name)
+  end
+
+  def self.availability_zones(region_name)
+    ec2 = AWS::EC2.new
+    ec2 = ec2.regions[region_name]
+    ec2.availability_zones.map(&:name)
   end
 
   private
   def create_instance_in_ec2
     return if existing
     ec2 = AWS::EC2.new
-    #ec2 = ec2.regions[region_name]
-    ec2 = ec2.regions[AwsConsole::Application::DEFAULT_REGION]
+    ec2 = ec2.regions[region_name]
     begin
       image = ec2.images[image_id]
       group = ec2.security_groups[security_group]
       pair = ec2.key_pairs[key_pair]
       i = image.run_instance(:key_pair => pair,
                             :security_groups => group,
-                            :instance_type => instance_type)
+                            :instance_type => instance_type,
+                            :availability_zone => availability_zone)
       i.tag('cluster', :value => cluster_name)
       i.tag('role', :value => role)
       i.tag('Name', :value => "#{cluster_name}-#{role}")

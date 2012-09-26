@@ -1,3 +1,4 @@
+    div "Region: #{params[:region_name]}"
     form :action => "/admin/instances/create_cluster",
          :method => :post do |f|
       table do
@@ -8,18 +9,22 @@
           th "Image ID"
           th "Key Pair"
           th "Instance Type"
+          th "Availability Zone(optional)"
         end
         tr do
           f.input :type => :hidden, :name => 'instance_indexes[]', :value => 0
           f.input :type => :hidden, :name => 'cluster_name', :value => params[:cluster_name]
+          f.input :type => :hidden, :name => 'region_name', :value => params[:region_name]
+          f.input :type => :hidden, :name => 'availability_zone', :value => params[:availability_zone]
           f.input :type => :hidden, :name => 'instance_0[cluster_name]', :value => params[:cluster_name]
           f.input :type => :hidden, :name => 'instance_0[role]', :value => "Master"
           td params[:cluster_name]
           td "Master"
-          td f.select options_for_select(Instance.available_security_groups), {:name => "instance_0[security_group]"}
-          td f.select options_for_select(Instance.available_image_ids), {:name => "instance_0[image_id]"}
-          td f.select options_for_select(Instance.available_key_pairs), {:name => "instance_0[key_pair]"}
+          td f.select options_for_select(Instance.available_security_groups(params[:region_name])), {:name => "instance_0[security_group]"}
+          td f.select options_for_select(Instance.available_image_ids(params[:region_name])), {:name => "instance_0[image_id]"}
+          td f.select options_for_select(Instance.available_key_pairs(params[:region_name])), {:name => "instance_0[key_pair]"}
           td f.select  options_for_select(InstanceType.all.map(&:name).sort.reverse), {:name => "instance_0[instance_type]"}
+          td f.select options_for_select([''].concat(Instance.availability_zones(params[:region_name]))), {:name => "instance_0[availability_zone]"}
         end
         for i in 1..params[:slave_count].to_i do
           tr do
@@ -28,13 +33,14 @@
             f.input :type => :hidden, :name => "instance_#{i}[role]", :value => "Slave"
             td params[:cluster_name]
             td "Slave"
-            td f.select options_for_select(Instance.available_security_groups), {:name => "instance_#{i}[security_group]"}
-            td f.select options_for_select(Instance.available_image_ids), {:name => "instance_#{i}[image_id]"}
-            td f.select options_for_select(Instance.available_key_pairs), {:name => "instance_#{i}[key_pair]"}
+            td f.select options_for_select(Instance.available_security_groups(params[:region_name])), {:name => "instance_#{i}[security_group]"}
+            td f.select options_for_select(Instance.available_image_ids(params[:region_name])), {:name => "instance_#{i}[image_id]"}
+            td f.select options_for_select(Instance.available_key_pairs(params[:region_name])), {:name => "instance_#{i}[key_pair]"}
             td f.select  options_for_select(InstanceType.all.map(&:name).sort.reverse), {:name => "instance_#{i}[instance_type]"}
+            td f.select options_for_select([''].concat(Instance.availability_zones(params[:region_name]))), {:name => "instance_#{i}[availability_zone]"}
           end
         end
       end
       f.input :type => :submit
     end
-
+# vim: set syntax=ruby:

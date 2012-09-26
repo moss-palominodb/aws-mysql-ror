@@ -60,8 +60,9 @@ ActiveAdmin.register Instance do
     instance_indexes = params['instance_indexes']
     ids = []
     instance_indexes.each do |i|
-      instance = Instance.create!(params["instance_#{i}"])
+      instance = Instance.create!(params["instance_#{i}"].merge({:region_name => params['region_name']}))
       ids << instance.aws_id
+      logger.debug instance.inspect
       logger.debug("##{i} is #{instance.valid? ? 'Valid' : 'Invalid'}")
     end
     redirect_to '/admin/instances', :notice => "Created #{instance_indexes.length} new instances: #{ids.join(', ')}"
